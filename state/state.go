@@ -21,6 +21,12 @@ var (
 	stateKey = []byte("stateKey")
 )
 
+type FnCalculateBlockTime func(lastBlockTime time.Time, commit *types.Commit, validators *types.ValidatorSet) time.Time
+
+var DefaultCaclBlockTimeFn FnCalculateBlockTime = func(lastBlockTime time.Time, commit *types.Commit, validators *types.ValidatorSet) time.Time {
+	return MedianTime(commit, validators)
+}
+
 //-----------------------------------------------------------------------------
 
 // InitStateVersion sets the Consensus.Block and Software versions,
@@ -247,7 +253,7 @@ func (state State) MakeBlock(
 	if height == state.InitialHeight {
 		timestamp = state.LastBlockTime // genesis time
 	} else {
-		timestamp = MedianTime(lastCommit, state.LastValidators)
+		timestamp = DefaultCaclBlockTimeFn(state.LastBlockTime, lastCommit, state.LastValidators)
 	}
 
 	// Fill rest of header with state data.
