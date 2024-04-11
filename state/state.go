@@ -27,6 +27,10 @@ var DefaultCaclBlockTimeFn FnCalculateBlockTime = func(lastBlockTime time.Time, 
 	return MedianTime(commit, validators)
 }
 
+var BlockMaker = func(state State, block *types.Block) *types.Block {
+	return block
+}
+
 //-----------------------------------------------------------------------------
 
 // InitStateVersion sets the Consensus.Block and Software versions,
@@ -265,7 +269,7 @@ func (state State) MakeBlock(
 		proposerAddress,
 	)
 
-	return block
+	return BlockMaker(state, block)
 }
 
 // MedianTime computes a median time for a given Commit (based on Timestamp field of votes messages) and the
